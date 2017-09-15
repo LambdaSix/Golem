@@ -45,8 +45,8 @@
   <ItemGroup>
     <Compile Include="Enumerations\AccessLevel.cs" />
     <Compile Include="Events\EventSink.cs" />
-    <Compile Include="Events\IProfessionInfo.cs" />
-    <Compile Include="Events\IRaceInfo.cs" />
+    <Compile Include="Interfaces\IProfessionInfo.cs" />
+    <Compile Include="Interfaces\IRaceInfo.cs" />
     <Compile Include="Interfaces\ISkillInfo.cs" />
     <Compile Include="Interfaces\IAccount.cs" />
     <Compile Include="Interfaces\IEntity.cs" />
