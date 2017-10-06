@@ -56,7 +56,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Game\CommandDispatcher.cs" />
+    <Compile Include="Server\Attributes\GameModuleAttribute.cs" />
+    <Compile Include="Server\CommandDispatcher.cs" />
+    <Compile Include="Server\CommandSystem.cs" />
     <Compile Include="Server\Network\DiscordConnection.cs" />
     <Compile Include="Server\Enumerations\AccessLevel.cs" />
     <Compile Include="Server\Events\EventSink.cs" />
@@ -81,6 +83,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Game\Core\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
