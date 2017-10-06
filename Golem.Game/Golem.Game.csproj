@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{530D7BBB-3139-4DEA-948C-F3DF4C7A42C0}</ProjectGuid>
+    <ProjectGuid>{56B9463C-096D-4D42-9F5E-7E5ADF6864C3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Golem.Common</RootNamespace>
-    <AssemblyName>Golem.Common</AssemblyName>
+    <RootNamespace>Golem.Game</RootNamespace>
+    <AssemblyName>Golem.Game</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,8 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+    <Reference Include="DSharpPlus">
+      <HintPath>..\packages\DSharpPlus.3.1.2\lib\net45\DSharpPlus.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -43,24 +43,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enumerations\AccessLevel.cs" />
-    <Compile Include="Events\EventSink.cs" />
-    <Compile Include="Interfaces\IProfessionInfo.cs" />
-    <Compile Include="Interfaces\IRaceInfo.cs" />
-    <Compile Include="Interfaces\ISkillInfo.cs" />
-    <Compile Include="Interfaces\IAccount.cs" />
-    <Compile Include="Interfaces\IEntity.cs" />
-    <Compile Include="Interfaces\IMobile.cs" />
-    <Compile Include="Interfaces\INetState.cs" />
-    <Compile Include="Interfaces\IRace.cs" />
-    <Compile Include="Interfaces\ISpawnable.cs" />
-    <Compile Include="Interfaces\ISpawner.cs" />
-    <Compile Include="IModuleInitializer.cs" />
+    <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Golem\Golem.csproj">
+      <Project>{2973F4FB-AD34-453D-B1D5-CC5B3D4A54C1}</Project>
+      <Name>Golem</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,17 +1,40 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using Golem.Common.Events;
 using Golem.Common.Interfaces;
 
 namespace Golem.Network
 {
+    public class GlobalCommands
+    {
+        [Command("login")]
+        public async Task LoginCommand(CommandContext e)
+        {
+            var client = e.Client;
+            var netState = NetworkManager.CreateClient(client, e.Message.Author);
+            netState.Start();
+
+            EventSink.UserConnected?.Invoke(this, new UserConnected(netState));
+        }
+
+        [Command("userCount")]
+        public async Task ConnectedUsersCommand(CommandContext e)
+        {
+            var client = e.Client;
+            await client.SendMessageAsync(e.Channel, $"There are {NetworkManager.NetStates.Count} users currently connected");
+        }
+    }
+
     public class DiscordConnection
     {
         /// <summary>
@@ -32,25 +55,15 @@ namespace Golem.Network
                 Token = botToken,
                 TokenType = TokenType.Bot,
                 AutoReconnect = true,
-            });            
+            });
 
-            Client.MessageCreated += ClientOnMessageCreated;
-        }
-
-        private Task ClientOnMessageCreated(MessageCreateEventArgs args)
-        {
-            if (args.Message.Content.Equals("!login", StringComparison.InvariantCultureIgnoreCase))
+            var commands = Client.UseCommandsNext(new CommandsNextConfiguration()
             {
-                Client.SendMessageAsync(args.Channel,
-                    $"[Debug] Hi, {args.Author.Username}, login request acknowledge, assigning NetState");
+                CaseSensitive = false,
+                StringPrefix = "!"
+            });
 
-                var netState = NetworkManager.CreateClient(Client, args.Author);
-                netState.Start();
-                Client.SendMessageAsync(args.Channel, $"[Debug] Created new NetState {netState.GetHashCode()}");
-                netState.SendMessage("Hi, this should be a DM, <3 Golem");
-            }
-
-            return Task.FromResult(true);
+            commands.RegisterCommands<GlobalCommands>();
         }
 
         public async void Start()
@@ -112,6 +125,15 @@ namespace Golem.Network
         public async void Start()
         {
             _directMessage = Client.CreateDmAsync(User).Result;
+            Client.MessageCreated += async (args) => await Task.Run(() => OnClientOnMessageCreated(args));
+        }
+
+        private void OnClientOnMessageCreated(MessageCreateEventArgs args)
+        {
+            if (args.Channel.IsPrivate && args.Author == User)
+            {
+                EventSink.UserMessageReceived?.Invoke(this, new UserMessageReceived(this, args));
+            }
         }
 
         /// <inheritdoc />

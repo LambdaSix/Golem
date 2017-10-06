@@ -41,7 +41,5 @@ namespace Golem.Common
         /// Bind relationships this module is responsible for.
         /// </summary>
         void Load();
-
-        void RegisterEvents(EventSink eventSink);
     }
 }

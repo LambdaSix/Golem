@@ -32,6 +32,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DSharpPlus, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DSharpPlus.3.1.2\lib\net45\DSharpPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="DSharpPlus.CommandsNext">
+      <HintPath>..\packages\DSharpPlus.CommandsNext.3.1.2\lib\net45\DSharpPlus.CommandsNext.dll</HintPath>
+    </Reference>
     <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
     </Reference>
@@ -45,6 +52,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Network\DiscordConnection.cs" />
+    <Compile Include="Enumerations\AccessLevel.cs" />
+    <Compile Include="Events\EventSink.cs" />
+    <Compile Include="GolemServer.cs" />
+    <Compile Include="ModuleLoader\IModuleInitializer.cs" />
+    <Compile Include="Interfaces\IAccount.cs" />
+    <Compile Include="Interfaces\IEntity.cs" />
+    <Compile Include="Interfaces\IMobile.cs" />
+    <Compile Include="Interfaces\INetState.cs" />
+    <Compile Include="Interfaces\IProfessionInfo.cs" />
+    <Compile Include="Interfaces\IRace.cs" />
+    <Compile Include="Interfaces\IRaceInfo.cs" />
+    <Compile Include="Interfaces\ISkillInfo.cs" />
+    <Compile Include="Interfaces\ISpawnable.cs" />
+    <Compile Include="Interfaces\ISpawner.cs" />
     <Compile Include="OptionsParse\HelpTextAttribute.cs" />
     <Compile Include="OptionsParse\Mono.Options-PCL.cs" />
     <Compile Include="OptionsParse\OptionSetExtras.cs" />
@@ -54,12 +76,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Golem.Core\Golem.Core.csproj">
-      <Project>{3295965D-9E6B-4E38-9779-D9DA0F4AC923}</Project>
-      <Name>Golem.Core</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
