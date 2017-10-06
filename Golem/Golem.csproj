@@ -39,6 +39,10 @@
     <Reference Include="DSharpPlus.CommandsNext">
       <HintPath>..\packages\DSharpPlus.CommandsNext.3.1.2\lib\net45\DSharpPlus.CommandsNext.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
     </Reference>
@@ -52,24 +56,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Network\DiscordConnection.cs" />
-    <Compile Include="Enumerations\AccessLevel.cs" />
-    <Compile Include="Events\EventSink.cs" />
-    <Compile Include="GolemServer.cs" />
-    <Compile Include="ModuleLoader\IModuleInitializer.cs" />
-    <Compile Include="Interfaces\IAccount.cs" />
-    <Compile Include="Interfaces\IEntity.cs" />
-    <Compile Include="Interfaces\IMobile.cs" />
-    <Compile Include="Interfaces\INetState.cs" />
-    <Compile Include="Interfaces\IProfessionInfo.cs" />
-    <Compile Include="Interfaces\IRace.cs" />
-    <Compile Include="Interfaces\IRaceInfo.cs" />
-    <Compile Include="Interfaces\ISkillInfo.cs" />
-    <Compile Include="Interfaces\ISpawnable.cs" />
-    <Compile Include="Interfaces\ISpawner.cs" />
-    <Compile Include="OptionsParse\HelpTextAttribute.cs" />
-    <Compile Include="OptionsParse\Mono.Options-PCL.cs" />
-    <Compile Include="OptionsParse\OptionSetExtras.cs" />
+    <Compile Include="Game\CommandDispatcher.cs" />
+    <Compile Include="Server\Network\DiscordConnection.cs" />
+    <Compile Include="Server\Enumerations\AccessLevel.cs" />
+    <Compile Include="Server\Events\EventSink.cs" />
+    <Compile Include="Server\GolemServer.cs" />
+    <Compile Include="Server\ModuleLoader\IModuleInitializer.cs" />
+    <Compile Include="Server\Interfaces\IAccount.cs" />
+    <Compile Include="Server\Interfaces\IEntity.cs" />
+    <Compile Include="Server\Interfaces\IMobile.cs" />
+    <Compile Include="Server\Interfaces\INetState.cs" />
+    <Compile Include="Server\Interfaces\IProfessionInfo.cs" />
+    <Compile Include="Server\Interfaces\IRace.cs" />
+    <Compile Include="Server\Interfaces\IRaceInfo.cs" />
+    <Compile Include="Server\Interfaces\ISkillInfo.cs" />
+    <Compile Include="Server\Interfaces\ISpawnable.cs" />
+    <Compile Include="Server\Interfaces\ISpawner.cs" />
+    <Compile Include="Server\OptionsParse\HelpTextAttribute.cs" />
+    <Compile Include="Server\OptionsParse\Mono.Options-PCL.cs" />
+    <Compile Include="Server\OptionsParse\OptionSetExtras.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

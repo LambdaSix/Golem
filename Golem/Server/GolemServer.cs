@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Golem.Common;
+using Golem.Game;
 using Golem.Network;
 using Ninject;
 
@@ -28,6 +29,7 @@ namespace Golem.Core
         private bool IsDebug { get; set; }
 
         private DiscordConnection Network { get; set; }
+        private CommandDispatcher CommandDispatcher { get; set; }
 
         public void Set() => _signal.Set();
 
@@ -45,6 +47,7 @@ namespace Golem.Core
             CreateKernel();
             Network.Start();
             // TODO: Issue global messages for ServerStarted
+            CommandDispatcher = new CommandDispatcher();
 
             while (!_closing)
             {

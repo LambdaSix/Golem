@@ -14,7 +14,6 @@ namespace Golem.Game
         public void Load()
         {
             Console.WriteLine("Registering Game Module!");
-            var commandDispatcher = new CommandDispatcher();
         }
     }
 
