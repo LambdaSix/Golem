@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using DSharpPlus.EventArgs;
-using Golem.Common.Interfaces;
+using Golem.Server.Interfaces;
 
-namespace Golem.Common.Events
+namespace Golem.Server.Events
 {
     public static class EventSink
     {

@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Golem.Common.Events;
 using Ninject;
 
-namespace Golem.Common
+namespace Golem.Server.ModuleLoader
 {
     public static class NinjectBootstrap
     {

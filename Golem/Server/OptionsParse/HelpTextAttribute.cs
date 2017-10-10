@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Golem {
+namespace Golem.Server.OptionsParse {
     [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
     public sealed class HelpTextAttribute : Attribute {
         private readonly string _defaultHelpText;

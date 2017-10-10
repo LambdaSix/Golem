@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.Serialization;
-using Golem.Common.Enumerations;
+using Golem.Server.Enumerations;
 
-namespace Golem.Common.Interfaces
+namespace Golem.Server.Interfaces
 {
     public interface IMobile : IEntity, IComparable<IMobile>, ISerializable, ISpawnable
     {

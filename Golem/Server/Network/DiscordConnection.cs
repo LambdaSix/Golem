@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.CommandsNext.Exceptions;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
-using Golem.Common.Events;
-using Golem.Common.Interfaces;
+using Golem.Server.Events;
+using Golem.Server.Interfaces;
 
-namespace Golem.Network
+namespace Golem.Server.Network
 {
     public class GlobalCommands
     {

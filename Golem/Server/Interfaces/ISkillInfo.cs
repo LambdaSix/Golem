@@ -1,4 +1,4 @@
-﻿namespace Golem.Common.Interfaces
+﻿namespace Golem.Server.Interfaces
 {
     public interface ISkillInfo
     {

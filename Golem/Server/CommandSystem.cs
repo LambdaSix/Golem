@@ -1,17 +1,15 @@
 using System;
 using System.Collections.Generic;
-using DSharpPlus.Entities;
-using Golem.Common.Enumerations;
-using Golem.Common.Events;
-using Golem.Common.Interfaces;
+using Golem.Server.Enumerations;
+using Golem.Server.Interfaces;
 
-namespace Golem.Game
+namespace Golem.Server
 {
     public delegate void CommandEventHandler(CommandEventArgs e);
 
     public class CommandEventArgs : EventArgs
     {
-        public INetState Mobile { get; }
+        public IMobile Mobile { get; }
 
         public string Command { get; }
 
@@ -29,7 +27,7 @@ namespace Golem.Game
             return Arguments[index];
         }
 
-        public CommandEventArgs(INetState mobile, string command, string argString, string[] arguments)
+        public CommandEventArgs(IMobile mobile, string command, string argString, string[] arguments)
         {
             Mobile = mobile;
             Command = command;
@@ -85,7 +83,7 @@ namespace Golem.Game
 
         public static AccessLevel BadCommandIgnoreLevel { get; set; } = AccessLevel.Player;
 
-        public static bool Handle(INetState from, string text)
+        public static bool Handle(IMobile from, string text)
         {
             int indexOf = text.IndexOf(' ');
 
@@ -112,7 +110,7 @@ namespace Golem.Game
 
             if (entry != null)
             {
-                if (from.Mobile.AccessLevel >= entry.AccessLevel)
+                if (from.AccessLevel >= entry.AccessLevel)
                 {
                     if (entry.Handler != null)
                     {
@@ -122,7 +120,7 @@ namespace Golem.Game
                 }
                 else
                 {
-                    if (from.Mobile.AccessLevel <= BadCommandIgnoreLevel)
+                    if (from.AccessLevel <= BadCommandIgnoreLevel)
                         return false;
 
                     from.SendMessage("You do not have access to that command.");
@@ -130,7 +128,7 @@ namespace Golem.Game
             }
             else
             {
-                if (from.Mobile.AccessLevel <= BadCommandIgnoreLevel)
+                if (from.AccessLevel <= BadCommandIgnoreLevel)
                     return false;
 
                 from.SendMessage("That is not a valid command.");

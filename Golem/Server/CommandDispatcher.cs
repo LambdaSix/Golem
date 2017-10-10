@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using DSharpPlus.EventArgs;
-using Golem.Common.Enumerations;
-using Golem.Common.Events;
-using Golem.Common.Interfaces;
+using Golem.Server.Enumerations;
+using Golem.Server.Events;
 
-namespace Golem.Game
+namespace Golem.Server
 {
     public class CommandDispatcher
     {

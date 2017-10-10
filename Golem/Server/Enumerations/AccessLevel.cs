@@ -1,4 +1,4 @@
-﻿namespace Golem.Common.Enumerations
+﻿namespace Golem.Server.Enumerations
 {
     public enum AccessLevel
     {

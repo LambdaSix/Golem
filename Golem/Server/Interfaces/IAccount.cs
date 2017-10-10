@@ -1,6 +1,6 @@
-﻿using Golem.Common.Enumerations;
+﻿using Golem.Server.Enumerations;
 
-namespace Golem.Common.Interfaces
+namespace Golem.Server.Interfaces
 {
     public interface IAccount
     {

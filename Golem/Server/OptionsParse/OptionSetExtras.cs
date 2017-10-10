@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Golem.OptionsParse {
+namespace Golem.Server.OptionsParse {
     public static class OptionSetExtras
     {
         public static string GetHelpText<T>(Expression<Func<T>> propertyExpr) {

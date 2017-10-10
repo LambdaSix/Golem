@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Golem.Common;
-using Golem.Game;
-using Golem.Network;
+using Golem.Server.ModuleLoader;
+using Golem.Server.Network;
 using Ninject;
 
-namespace Golem.Core
+namespace Golem.Server
 {
     /// <summary>
     /// PArsed and clean variant of ArgumentOptions
