@@ -2,14 +2,6 @@
 
 namespace Golem.Server.Attributes
 {
-    public class GameModuleAttribute : Attribute
-    {
-        public GameModuleAttribute()
-        {
-            
-        }
-    }
-
     public class GameCommand : Attribute
     {
         public string Command { get; }

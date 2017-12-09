@@ -1,9 +1,11 @@
-﻿namespace Golem.Server.Interfaces
+﻿using Capsicum;
+
+namespace Golem.Server.Interfaces
 {
     public interface INetState
     {
         IAccount Account { get; }
-        IMobile Mobile { get; }
+        Entity Entity { get; }
 
         /// <summary>
         /// Binds this INetState to a Client

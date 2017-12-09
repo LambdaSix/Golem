@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime;
 using System.Threading;
-using Golem.Server.ModuleLoader;
+using DSharpPlus.Entities;
+using Golem.Server.Database;
 using Golem.Server.Network;
+using Golem.Server.Session;
 using Ninject;
 
 namespace Golem.Server
@@ -18,16 +21,57 @@ namespace Golem.Server
         public bool Debug { get; set; }
     }
 
+    public enum LogType
+    {
+        Info,
+        Warning,
+        Error,
+    }
+
+    public class ServerConstants
+    {
+        public static object WelcomeRoom;
+        public static object StartRoom;
+
+        public static bool AutoApprovedEnabled = true;
+        public static int DeadHitpoints = -3;
+        public static int IncapacitatedHitpoints = -10;
+        public static double CorpseDecayTimeMs = TimeSpan.FromMinutes(30).TotalMilliseconds;
+    }
+
     public class GolemServer : IDisposable
     {
+        public IConnectionListener ConnListener { get; }
+        public IConnectionMonitor ConnMonitor { get; }
+        public ISessionMonitor SessionMonitor { get; }
+        public IDatabase Database { get; }
+        public static GolemServer Current { get; private set; }
+
         private bool _closing;
         private readonly AutoResetEvent _signal = new AutoResetEvent(true);
         private bool IsDebug { get; set; }
 
-        private DiscordConnection Network { get; set; }
-        private CommandDispatcher CommandDispatcher { get; set; }
+
+        // TODO: Make a singleton WorldState?
+        public DateTime CurrentTime { get; set; }
 
         public void Set() => _signal.Set();
+
+        public GolemServer(
+            IConnectionListener connListener,
+            IConnectionMonitor connMonitor,
+            ISessionMonitor sessionMonitor,
+            IDatabase database,
+            IDynamicCommandLookup dynamicCommandLookup,
+            IEnumerable<IHandlers> handlers
+            )
+        {
+            ConnListener = connListener;
+            ConnMonitor = connMonitor;
+            SessionMonitor = sessionMonitor;
+            Database = database;
+            Current = this;
+        }
 
         public void Main(ServerOptions options)
         {
@@ -41,16 +85,33 @@ namespace Golem.Server
             SetupNetwork();
 
             CreateKernel();
-            Network.Start();
-            // TODO: Issue global messages for ServerStarted
-            CommandDispatcher = new CommandDispatcher();
 
+            // TODO: Rate-limit the server processing.
             while (!_closing)
             {
                 _signal.WaitOne();
-                // TODO: Slice game tick
-                // TODO: Slice message pump
-                // TODO: Process any disposed network handles
+
+                // Process game loop
+
+                var nextTickDue = false;
+                TimeSpan span;
+
+                while (!nextTickDue)
+                {
+                    var elapsedTime = DateTime.UtcNow;
+                    span = elapsedTime - CurrentTime;
+
+                    if (span.TotalMilliseconds > 1000 / TimeConstants.TicksPerSecond)
+                        nextTickDue = false;
+                    else
+                    {
+                        int sleepTime = (int) ((1000 / TimeConstants.TicksPerSecond) - span.TotalMilliseconds);
+                        Thread.Sleep(sleepTime);
+                        nextTickDue = true;
+                    }
+                }
+
+                CurrentTime = DateTime.UtcNow;
             }
         }
 
@@ -74,14 +135,14 @@ namespace Golem.Server
 
         public void SetupNetwork()
         {
-            Network = new DiscordConnection(Secrets.RetrieveBotKey(), "Golem");
+            
         }
 
         public IKernel CreateKernel()
         {
             Console.WriteLine("Core: Searching & Registering Services/Modules");
             var kernel = new StandardKernel();
-            NinjectBootstrap.LoadModules(kernel);
+            //NinjectBootstrap.LoadModules(kernel);
 
             return kernel;
         }
@@ -95,6 +156,24 @@ namespace Golem.Server
 
             _closing = true;
             Console.WriteLine("Core: Shutting down");
+        }
+
+        public void Log(LogType logType, string message)
+        {
+            try
+            {
+                var log = $"{logType}: {message}";
+                File.AppendAllText("Log\\server.log", log);
+            }
+            catch
+            {
+
+            }
+        }
+
+        public void Log(string message, bool newLine = true)
+        {
+            Console.Write($"{DateTime.Now,-10:mm:ss.fff}: {message}{(newLine ? "\n" : string.Empty)}");
         }
     }
 

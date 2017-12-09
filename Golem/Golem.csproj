@@ -8,16 +8,17 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Golem</RootNamespace>
     <AssemblyName>Golem</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>.\</OutputPath>
+    <OutputPath>..\output\debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -39,6 +40,9 @@
     <Reference Include="DSharpPlus.CommandsNext">
       <HintPath>..\packages\DSharpPlus.CommandsNext.3.1.2\lib\net45\DSharpPlus.CommandsNext.dll</HintPath>
     </Reference>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -56,36 +60,78 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Server\Attributes\GameModuleAttribute.cs" />
+    <Compile Include="Game\Core\Entity.cs" />
+    <Compile Include="Server\Helpers\ExperienceHelper.cs" />
+    <Compile Include="Game\Mobiles\Player.cs" />
+    <Compile Include="Server\Account\Account.cs" />
+    <Compile Include="Server\Attributes\CommandAttribute.cs" />
+    <Compile Include="Server\Attributes\GameCommand.cs" />
     <Compile Include="Server\CommandDispatcher.cs" />
     <Compile Include="Server\CommandSystem.cs" />
-    <Compile Include="Server\Network\DiscordConnection.cs" />
+    <Compile Include="Server\Database\Storable.cs" />
+    <Compile Include="Server\Extensions\StringExtensions.cs" />
+    <Compile Include="Server\Helpers\RoomHelper.cs" />
+    <Compile Include="Server\IConnectionListener.cs" />
+    <Compile Include="Server\IConnectionMonitor.cs" />
+    <Compile Include="Server\InstancedItem.cs" />
+    <Compile Include="Server\IService.cs" />
+    <Compile Include="Server\Network\ConnectionEventArgs.cs" />
+    <Compile Include="Server\Network\ConnectionHandler.cs" />
+    <Compile Include="Server\Network\ConnectionListener.cs" />
+    <Compile Include="Server\Network\ConnectionMonitor.cs" />
+    <Compile Include="Server\Network\IConnection.cs" />
+    <Compile Include="Server\Network\LineReceivedEventArgs.cs" />
+    <Compile Include="Server\PrototypeItem.cs" />
+    <Compile Include="Server\Session\ISession.cs" />
+    <Compile Include="Server\Session\ISessionMonitor.cs" />
+    <Compile Include="Server\IUpdatable.cs" />
+    <Compile Include="Server\Mobile.cs" />
+    <Compile Include="Server\Network\Connection.cs" />
     <Compile Include="Server\Enumerations\AccessLevel.cs" />
     <Compile Include="Server\Events\EventSink.cs" />
     <Compile Include="Server\GolemServer.cs" />
-    <Compile Include="Server\ModuleLoader\IModuleInitializer.cs" />
     <Compile Include="Server\Interfaces\IAccount.cs" />
-    <Compile Include="Server\Interfaces\IEntity.cs" />
     <Compile Include="Server\Interfaces\IMobile.cs" />
     <Compile Include="Server\Interfaces\INetState.cs" />
-    <Compile Include="Server\Interfaces\IProfessionInfo.cs" />
-    <Compile Include="Server\Interfaces\IRace.cs" />
-    <Compile Include="Server\Interfaces\IRaceInfo.cs" />
-    <Compile Include="Server\Interfaces\ISkillInfo.cs" />
-    <Compile Include="Server\Interfaces\ISpawnable.cs" />
-    <Compile Include="Server\Interfaces\ISpawner.cs" />
     <Compile Include="Server\OptionsParse\HelpTextAttribute.cs" />
     <Compile Include="Server\OptionsParse\Mono.Options-PCL.cs" />
     <Compile Include="Server\OptionsParse\OptionSetExtras.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Server\Session\Session.cs" />
+    <Compile Include="Server\Session\SessionMonitor.cs" />
+    <Compile Include="Server\Session\SessionState.cs" />
+    <Compile Include="Server\Session\States\CreateNewPlayerState.cs" />
+    <Compile Include="Server\Text\ITextTransformer.cs" />
+    <Compile Include="Server\Text\IOutputTextWriter.cs" />
+    <Compile Include="Server\TimeConstants.cs" />
+    <Compile Include="Server\UserInterface\SimpleWordLexer.cs" />
+    <Compile Include="Server\UserInterface\TextEditor.cs" />
+    <Compile Include="Server\UserInterface\TextToken.cs" />
+    <Compile Include="Server\World\Movement.cs" />
+    <Compile Include="Server\World\Room.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Game\Core\" />
+    <Folder Include="Game\Accounting\" />
+    <Folder Include="Game\Commands\" />
+    <Folder Include="Game\Items\" />
+    <Folder Include="Game\Skills\" />
+    <Folder Include="Game\Spells\" />
+    <Folder Include="WorldGen\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Capsicum\Capsicum\Capsicum.csproj">
+      <Project>{15FC1429-8161-4A89-A1E1-5AF4C8AA134A}</Project>
+      <Name>Capsicum</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Golem.Database\Golem.Database.csproj">
+      <Project>{C22D7108-E250-41EA-9363-E9E61D0DD9B6}</Project>
+      <Name>Golem.Database</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

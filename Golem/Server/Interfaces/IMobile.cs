@@ -4,8 +4,10 @@ using Golem.Server.Enumerations;
 
 namespace Golem.Server.Interfaces
 {
-    public interface IMobile : IEntity, IComparable<IMobile>, ISerializable, ISpawnable
+    public interface IMobile : IComparable<IMobile>
     {
+        int Serial { get; set; }
+
         void SendMessage(string messageStr);
         AccessLevel AccessLevel { get; set; }
     }
