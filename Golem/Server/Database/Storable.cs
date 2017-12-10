@@ -222,4 +222,3 @@ namespace Golem.Server.Database
         }
     }
 }
-}

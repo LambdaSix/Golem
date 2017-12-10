@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime;
 using System.Threading;
-using DSharpPlus.Entities;
 using Golem.Server.Database;
 using Golem.Server.Network;
 using Golem.Server.Session;

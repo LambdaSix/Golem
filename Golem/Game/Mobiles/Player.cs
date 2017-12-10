@@ -332,7 +332,7 @@ namespace Golem.Game.Mobiles
         }
     }
 
-    public interface IPlayer
+    public interface IPlayer : IStorable
     {
         string Forename { get; set; }
         string PasswordHash { get; set; }

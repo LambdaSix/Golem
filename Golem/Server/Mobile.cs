@@ -1,11 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Capsicum;
-using Capsicum.Interfaces;
 using Golem.Game.Mobiles;
-using Golem.Server.Enumerations;
-using Golem.Server.Interfaces;
 using Golem.Server.Session;
 using Golem.Server.World;
 using Newtonsoft.Json;
@@ -38,7 +34,7 @@ namespace Golem.Server
 
     public interface IMobile
     {
-        public string Name { get; set; }
+        string Name { get; set; }
 
         int BaseStrength { get; set; }
         int BaseDexterity { get; set; }

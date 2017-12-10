@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Capsicum;
-using Capsicum.Interfaces;
 
 namespace Golem.Server.World
 {

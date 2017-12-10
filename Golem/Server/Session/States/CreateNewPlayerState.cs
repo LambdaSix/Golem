@@ -1,4 +1,5 @@
 ﻿using Golem.Game.Mobiles;
+using Golem.Server.Extensions;
 using Golem.Server.UserInterface;
 
 namespace Golem.Server.Session.States
@@ -111,9 +112,115 @@ namespace Golem.Server.Session.States
                 Gender = _gender,
                 Pronouns = _pronouns,
                 Prompt = ">",
+                Level = 0,
+                Experience = 0,
                 RespawnRoom = ServerConstants.StartRoom,
                 Status = MobileStatus.Standing
             };
+
+            GolemServer.Current.Database.Put(player);
+        }
+
+        public override void OnStateEnter()
+        {
+            switch (_currentState)
+            {
+                case State.EnterDescription:
+                    if (!_textEditor.Success)
+                    {
+                        Session.WriteLine("You must give your character a description");
+                        Session.PushState(_textEditor);
+                        return;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(_textEditor.Result))
+                    {
+                        Session.WriteLine("You must give your character a description");
+                        Session.PushState(_textEditor);
+                        return;
+                    }
+
+                    _description = _textEditor.Result;
+                    ChangeState(State.EnterShortDescription);
+                    break;
+                default:
+                    ChangeState(State.EnterForename);
+                    break;
+            }
+        }
+
+        public override void OnInput(string input)
+        {
+            switch (_currentState)
+            {
+                case State.EnterForename:
+                    if (!PlayerLogin.ValidateUsername(input))
+                    {
+                        Session.WriteLine("Invalid uername");
+                        ChangeState(State.EnterForename);
+                        break;
+                    }
+
+                    foreName = StringHelpers.Capitalise(input);
+                    ChangeState(State.EnterPassword);
+                    break;
+
+                case State.EnterPassword:
+                    _password = input;
+                    ChangeState(State.SelectGender);
+                    break;
+
+                case State.SelectGender:
+                    if (input.ToLower() == "m" || input.ToLower() == "male")
+                    {
+                        _gender = PlayerGender.Male;
+                        ChangeState(State.SelectPronouns);
+                    }
+
+                    else if (input.ToLower() == "f" || input.ToLower() == "female")
+                    {
+                        _gender = PlayerGender.Female;
+                        ChangeState(State.SelectPronouns);
+                    }
+
+                    else if (input.ToLower() == "n" || input.ToLower() == "neuter")
+                    {
+                        _gender = PlayerGender.Neuter;
+                        ChangeState(State.SelectPronouns);
+                    }
+                    else
+                    {
+                        Session.WriteLine("Unknown body type");
+                        ChangeState(State.SelectGender);
+                    }
+                    break;
+
+                case State.SelectPronouns:
+                    if (input.ToLower() == "m" || input.ToLower() == "masculine")
+                    {
+                        _pronouns= PlayerPronouns.Masculine;
+                        ChangeState(State.EnterDescription);
+                    }
+
+                    else if (input.ToLower() == "f" || input.ToLower() == "feminine")
+                    {
+                        _pronouns = PlayerPronouns.Feminine;
+                        ChangeState(State.EnterDescription);
+                    }
+
+                    else if (input.ToLower() == "n" || input.ToLower() == "neuter")
+                    {
+                        _pronouns = PlayerPronouns.Neuter;
+                        ChangeState(State.EnterDescription);
+                    }
+                    else
+                    {
+                        Session.WriteLine("Unknown pronouns");
+                        ChangeState(State.SelectPronouns);
+                    }
+                    break;
+
+            }
         }
     }
 }

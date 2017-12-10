@@ -3,14 +3,6 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using Capsicum;
-using DSharpPlus;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.EventArgs;
-using Golem.Server.Events;
-using Golem.Server.Interfaces;
 
 namespace Golem.Server.Network
 {

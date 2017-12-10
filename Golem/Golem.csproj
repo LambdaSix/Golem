@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Golem</RootNamespace>
     <AssemblyName>Golem</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -60,14 +61,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Game\Core\Entity.cs" />
     <Compile Include="Server\Helpers\ExperienceHelper.cs" />
     <Compile Include="Game\Mobiles\Player.cs" />
-    <Compile Include="Server\Account\Account.cs" />
     <Compile Include="Server\Attributes\CommandAttribute.cs" />
     <Compile Include="Server\Attributes\GameCommand.cs" />
-    <Compile Include="Server\CommandDispatcher.cs" />
-    <Compile Include="Server\CommandSystem.cs" />
     <Compile Include="Server\Database\Storable.cs" />
     <Compile Include="Server\Extensions\StringExtensions.cs" />
     <Compile Include="Server\Helpers\RoomHelper.cs" />
@@ -88,11 +85,7 @@
     <Compile Include="Server\Mobile.cs" />
     <Compile Include="Server\Network\Connection.cs" />
     <Compile Include="Server\Enumerations\AccessLevel.cs" />
-    <Compile Include="Server\Events\EventSink.cs" />
     <Compile Include="Server\GolemServer.cs" />
-    <Compile Include="Server\Interfaces\IAccount.cs" />
-    <Compile Include="Server\Interfaces\IMobile.cs" />
-    <Compile Include="Server\Interfaces\INetState.cs" />
     <Compile Include="Server\OptionsParse\HelpTextAttribute.cs" />
     <Compile Include="Server\OptionsParse\Mono.Options-PCL.cs" />
     <Compile Include="Server\OptionsParse\OptionSetExtras.cs" />
@@ -118,9 +111,13 @@
   <ItemGroup>
     <Folder Include="Game\Accounting\" />
     <Folder Include="Game\Commands\" />
+    <Folder Include="Game\Core\" />
     <Folder Include="Game\Items\" />
     <Folder Include="Game\Skills\" />
     <Folder Include="Game\Spells\" />
+    <Folder Include="Server\Account\" />
+    <Folder Include="Server\Events\" />
+    <Folder Include="Server\Interfaces\" />
     <Folder Include="WorldGen\" />
   </ItemGroup>
   <ItemGroup>
