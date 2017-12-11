@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game\Items\Coins.cs" />
     <Compile Include="Server\Account\Account.cs" />
     <Compile Include="Server\Helpers\ExperienceHelper.cs" />
     <Compile Include="Game\Mobiles\Player.cs" />
