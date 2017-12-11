@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Golem.Game.Mobiles;
 
 namespace Golem.Server.Session
 {

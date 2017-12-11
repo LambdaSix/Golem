@@ -104,6 +104,11 @@ namespace Golem.Game.Mobiles
             
         }
 
+        public void SetOutputWriter(IOutputTextWriter writer)
+        {
+            OutputWriter = writer;
+        }
+
         public bool CheckPassword(string password)
         {
             var hash = Hash(password);
@@ -365,5 +370,7 @@ namespace Golem.Game.Mobiles
         int Age { get; }
 
         string GetOtherPlayerDescription(IPlayer subject);
+        bool CheckPassword(string password);
+        void SetOutputWriter(IOutputTextWriter writer);
     }
 }

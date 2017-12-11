@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Golem.Game.Mobiles;
 
 namespace Golem.Server.Extensions
@@ -101,6 +102,29 @@ namespace Golem.Server.Extensions
             }
 
             return result.ToString();
+        }
+
+        public static string Capitalise(string input)
+        {
+            if (String.IsNullOrEmpty(input))
+                return input;
+
+            return input.Substring(0, 1).ToUpper() + input.Substring(1);
+        }
+
+        public static string SplitLine(string value, int length = 80)
+        {
+            if (String.IsNullOrEmpty(value))
+                return value;
+
+            if (!String.IsNullOrEmpty(value) && value.Length < 80)
+                return value;
+
+            var line = value.Substring(0, 80);
+            line = line.Substring(0, line.LastIndexOf(' ')).Trim();
+            value = value.Remove(0, line.Length).Trim();
+
+            return line + "\n" + SplitLine(value);
         }
     }
 

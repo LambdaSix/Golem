@@ -1,4 +1,5 @@
 ﻿using Golem.Game.Mobiles;
+using Golem.Server.Account;
 using Golem.Server.Extensions;
 using Golem.Server.UserInterface;
 
@@ -154,14 +155,14 @@ namespace Golem.Server.Session.States
             switch (_currentState)
             {
                 case State.EnterForename:
-                    if (!PlayerLogin.ValidateUsername(input))
+                    if (!Accounts.ValidateUsername(input))
                     {
                         Session.WriteLine("Invalid uername");
                         ChangeState(State.EnterForename);
                         break;
                     }
 
-                    foreName = StringHelpers.Capitalise(input);
+                    _forename = StringHelpers.Capitalise(input);
                     ChangeState(State.EnterPassword);
                     break;
 
@@ -220,6 +221,10 @@ namespace Golem.Server.Session.States
                     }
                     break;
 
+                case State.EnterShortDescription:
+                    _shortDescription = input;
+                    ChangeState(State.Finished);
+                    break;
             }
         }
     }

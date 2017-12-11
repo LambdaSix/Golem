@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Server\Account\Account.cs" />
     <Compile Include="Server\Helpers\ExperienceHelper.cs" />
     <Compile Include="Game\Mobiles\Player.cs" />
     <Compile Include="Server\Attributes\CommandAttribute.cs" />
@@ -95,6 +96,8 @@
     <Compile Include="Server\Session\SessionMonitor.cs" />
     <Compile Include="Server\Session\SessionState.cs" />
     <Compile Include="Server\Session\States\CreateNewPlayerState.cs" />
+    <Compile Include="Server\Session\States\EnterWorldState.cs" />
+    <Compile Include="Server\Session\States\PlayerLoginState.cs" />
     <Compile Include="Server\Text\ITextTransformer.cs" />
     <Compile Include="Server\Text\IOutputTextWriter.cs" />
     <Compile Include="Server\TimeConstants.cs" />
