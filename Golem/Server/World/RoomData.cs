@@ -17,6 +17,11 @@ namespace Golem.Server.World
         In = 0x00000080
     }
 
+    public class RoomExit
+    {
+        public string Leadsto
+    }
+
     [Flags]
     public enum RoomType : Int64
     {
@@ -150,26 +155,5 @@ namespace Golem.Server.World
 
         /// <inheritdoc />
         IEnumerator IEnumerable.GetEnumerator() => RoomFlags.GetEnumerator();
-    }
-
-    public class RoomComponent : IComponent
-    {
-        public int Id { get; set; }
-        public RoomType Type { get; set; }
-        public string Description { get; set; }
-        public string Title { get; set; }
-        public Directions ExitDirections { get; set; }
-
-        // TODO: Foraging, Botanising, & Harvesting
-        //public ForageInformation Forageable { get; set; }
-        //public BotaniseInformation Botanisable { get; set; }
-        //public HarvestInformation Harvestable { get; set; }
-
-        public bool ContainsCamp { get; set; }
-
-        /// <summary>
-        /// All things 'in' this Room.
-        /// </summary>
-        public IEnumerable<Entity> Contents { get; set; }
     }
 }

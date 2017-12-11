@@ -106,20 +106,17 @@
     <Compile Include="Server\UserInterface\TextEditor.cs" />
     <Compile Include="Server\UserInterface\TextToken.cs" />
     <Compile Include="Server\World\Movement.cs" />
-    <Compile Include="Server\World\Room.cs" />
+    <Compile Include="Server\World\RoomData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Game\Accounting\" />
     <Folder Include="Game\Commands\" />
     <Folder Include="Game\Core\" />
-    <Folder Include="Game\Items\" />
     <Folder Include="Game\Skills\" />
     <Folder Include="Game\Spells\" />
-    <Folder Include="Server\Account\" />
     <Folder Include="Server\Events\" />
     <Folder Include="Server\Interfaces\" />
     <Folder Include="WorldGen\" />
