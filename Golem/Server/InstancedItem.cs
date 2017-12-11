@@ -97,7 +97,7 @@ namespace Golem.Server
         {
             session.WriteLine(Description);
 
-            if (WearLocation.Container || WearLocation.Corpse)
+            if (WearLocation == WearLocation.Container || WearLocation == WearLocation.Corpse)
             {
                 if (ContainedItems.Count == 0 && Gold <= 0)
                 {
@@ -109,7 +109,7 @@ namespace Golem.Server
                     session.WriteLine($"\t{Gold} gold coin{(Gold > 1 ? "s" : "")}");
 
                 foreach (var itemLine in ContainedItems
-                    .GroupBy(i => i.Value)
+                    .GroupBy(i => i.Key)
                     .Select(group => new
                     {
                         ItemName = group.Key,
