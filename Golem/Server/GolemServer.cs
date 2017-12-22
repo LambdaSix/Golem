@@ -45,6 +45,7 @@ namespace Golem.Server
         public ISessionMonitor SessionMonitor { get; }
         public IDatabase Database { get; }
         public static GolemServer Current { get; private set; }
+        public Random Random { get; } = new Random();
 
         private bool _closing;
         private readonly AutoResetEvent _signal = new AutoResetEvent(true);

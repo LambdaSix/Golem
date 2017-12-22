@@ -19,7 +19,11 @@ namespace Golem.Server.World
 
     public class RoomExit
     {
-        public string Leadsto
+        public string LeadsTo { get; set; }
+        public bool IsDoor { get; set; }
+        public bool IsOpen { get; set; }
+        public bool IsLocked { get; set; }
+        public string KeyItemKey { get; set; }
     }
 
     [Flags]

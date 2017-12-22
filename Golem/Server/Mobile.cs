@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using Golem.Game.Items;
 using Golem.Game.Mobiles;
+using Golem.Server.Database;
 using Golem.Server.Session;
 using Golem.Server.World;
 using Newtonsoft.Json;
@@ -32,9 +35,10 @@ namespace Golem.Server
         Corpse,
     }
 
-    public interface IMobile
+    public interface IMobile : IStorable
     {
         string Name { get; set; }
+        string Description { get; set; }
 
         int BaseStrength { get; set; }
         int BaseDexterity { get; set; }
@@ -64,11 +68,16 @@ namespace Golem.Server
         int Charisma { get; }
         int Luck { get; }
         string HitPointDescription { get; }
+        IEnumerable<string> Keywords { get; set; }
     }
 
     public abstract class Mobile : IMobile
     {
+        public string Key => Name.ToLower();
+
         public string Name { get; set; }
+        public string Description { get; set; }
+        public IEnumerable<string> Keywords { get; set; }
 
         public int BaseStrength { get; set; }
         public int BaseDexterity { get; set; }
@@ -273,6 +282,73 @@ namespace Golem.Server
 
                 return "is mortally wounded";
             }
+        }
+
+        public MobileStatus Status { get; set; }
+        public string Location { get; set; }
+    }
+
+    public class MobTemplate : Mobile
+    {
+        public string[] RespawnRoom { get; set; }
+        public string[] Phrases { get; set; }
+        public double TalkProbability { get; set; }
+        public long MinimumTalkInterval { get; set; }
+        public bool Aggro { get; set; }
+        public List<string> AllowedRooms { get; set; } = new List<string>();
+        public new List<string> Inventory { get; private set; } = new List<string>();
+        public new Dictionary<WearLocation, string> Equipped { get; private set; } = new Dictionary<WearLocation, string>();
+        public new Dictionary<string, Tuple<double,double>> Skills { get; private set; } = new Dictionary<string, Tuple<double, double>>();
+    }
+
+    public class MobInstance : Mobile
+    {
+        private Guid _guid;
+        private DateTime _lastTimeTalked;
+        private DateTime _lastTimeWalked;
+        private bool _skillLoopStarted;
+        private bool _skillReady;
+
+        public string Key => _guid.ToString();
+
+        public string MobTemplateKey { get; set; }
+        public string[] RespawnRoom { get; set; }
+        public string[] Phrases { get; set; }
+        public double TalkProbability { get; set; }
+        public long MinimumTalkInterval { get; set; }
+        public bool Aggro { get; set; }
+        public List<string> AllowedRooms { get; set; }
+        public new Dictionary<string, Tuple<double,double>> Skills { get; set; }
+
+        public CoinStack Gold { get; set; }
+        public CoinStack MaxGold { get; set; }
+        public CoinStack MinGold { get; set; }
+
+        /// <summary>
+        /// Copy constructor.
+        /// </summary>
+        /// <param name="template"></param>
+        public MobInstance(MobTemplate template)
+        {
+            _guid = new Guid(template.Key);
+
+            Name = template.Name;
+            MobTemplateKey = template.Key;
+            Status = template.Status;
+            Keywords = template.Keywords;
+            Description = template.Description;
+            RespawnRoom = template.RespawnRoom;
+            Location = template.Location;
+            Phrases = template.Phrases;
+            TalkProbability = template.TalkProbability;
+            MinimumTalkInterval = template.MinimumTalkInterval;
+            HitPoints = template.HitPoints;
+            Aggro = template.Aggro;
+            BaseArmor = template.BaseArmor;
+            BaseHitRoll = template.BaseHitRoll;
+            BaseDamRoll = template.BaseDamRoll;
+            AllowedRooms = template.AllowedRooms ?? new List<string>();
+            Inventory = template.Inventory ?? new Dictionary<string, string>();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Golem.Game.Mobiles;
 using Golem.Server.Database;
+using Golem.Server.Helpers;
 using Golem.Server.Session;
 using Newtonsoft.Json;
 
@@ -182,7 +183,7 @@ namespace Golem.Server
             session.Player.Inventory[Key] = Name;
 
             session.WriteLine("You remove {0}", Name);
-            // RoomHelper.GetPlayerRoom(session.Player).SendPlayers(string.Format("%d removes {0}", Name), session.Player, null, session.Player);
+            RoomHelper.GetPlayerRoom(session.Player).SendPlayers(string.Format("%d removes {0}", Name), session.Player, null, session.Player);
         }
     }
 }

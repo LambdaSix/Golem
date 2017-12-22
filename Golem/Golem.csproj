@@ -106,6 +106,7 @@
     <Compile Include="Server\UserInterface\TextEditor.cs" />
     <Compile Include="Server\UserInterface\TextToken.cs" />
     <Compile Include="Server\World\Movement.cs" />
+    <Compile Include="Server\World\Room.cs" />
     <Compile Include="Server\World\RoomData.cs" />
   </ItemGroup>
   <ItemGroup>

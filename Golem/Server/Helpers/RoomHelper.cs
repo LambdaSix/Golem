@@ -1,6 +1,7 @@
-﻿using Golem.Server;
+﻿using Golem.Game.Mobiles;
+using Golem.Server.World;
 
-namespace Golem.Game.Mobiles
+namespace Golem.Server.Helpers
 {
     public class RoomHelper
     {

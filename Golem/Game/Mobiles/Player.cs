@@ -6,6 +6,7 @@ using System.Text;
 using Golem.Server;
 using Golem.Server.Database;
 using Golem.Server.Extensions;
+using Golem.Server.Helpers;
 using Golem.Server.Text;
 using Newtonsoft.Json;
 
@@ -43,7 +44,7 @@ namespace Golem.Game.Mobiles
         public string Name { get; set; }
     }
 
-    public class Player : Mobile, IStorable, IPlayer
+    public class Player : Mobile, IPlayer
     {
         string _passwordHash;
         private int _weight;
@@ -58,14 +59,12 @@ namespace Golem.Game.Mobiles
 
         public string Forename { get; set; }
         public string ShortDescription { get; set; }
-        public string Description { get; set; }
         public object Location { get; set; }
         public bool Approved { get; set; }
         public PlayerGender Gender { get; set; }
         public PlayerPronouns Pronouns { get; set; }
         public string Prompt { get; set; }
         public object RespawnRoom { get; set; }
-        public MobileStatus Status { get; set; }
 
         public bool IsAdmin { get; set; }
         public int Level { get; set; }
@@ -141,12 +140,12 @@ namespace Golem.Game.Mobiles
             return subject.ShortDescription;
         }
 
-        public void Send(string format, Player subject)
+        public void Send(string format, IPlayer subject)
         {
             Send(format, subject, null);
         }
 
-        public void Send(string format, Player subject, Player target)
+        public void Send(string format, IPlayer subject, IPlayer target)
         {
             OutputWriter.WriteLine(StringHelpers.BuildString(format, this, subject, target));
         }
@@ -337,7 +336,7 @@ namespace Golem.Game.Mobiles
         }
     }
 
-    public interface IPlayer : IStorable
+    public interface IPlayer : IStorable, IMobile
     {
         string Forename { get; set; }
         string PasswordHash { get; set; }
@@ -369,8 +368,12 @@ namespace Golem.Game.Mobiles
         [JsonIgnore]
         int Age { get; }
 
+        Dictionary<string, string> RememberedNames { get; }
+
         string GetOtherPlayerDescription(IPlayer subject);
         bool CheckPassword(string password);
         void SetOutputWriter(IOutputTextWriter writer);
+        void Send(string format, IPlayer subject);
+        void Send(string format, IPlayer subject, IPlayer target);
     }
 }

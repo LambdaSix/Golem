@@ -126,6 +126,11 @@ namespace Golem.Server.Extensions
 
             return line + "\n" + SplitLine(value);
         }
+
+        public static string[] GetKeywords(string value)
+        {
+            return value.Split(new char[] {' ', '!', '?', ',', '.', ';', ':'}, StringSplitOptions.RemoveEmptyEntries);
+        }
     }
 
     public static class StringExtensions
