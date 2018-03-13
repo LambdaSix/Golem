@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Linq;
+using Capsicum;
 using Golem.Game.Mobiles;
 using Golem.Server.Account;
 
@@ -15,7 +17,7 @@ namespace Golem.Server.Session.States
         private State _currentState;
         private string _playerName;
         private string _password;
-        private IPlayer _player;
+        private Entity _player;
         private const int MaxPasswordAttempts = 3;
         private int _currentPasswordAttempt;
 
@@ -35,9 +37,11 @@ namespace Golem.Server.Session.States
             }
         }
 
-        private IPlayer GetPlayer(string playerName)
+        private Entity GetPlayer(string accountName)
         {
-            return GolemServer.Current.Database.Get<Player>(Player.NameToKey(playerName));
+            return GolemServer.Current.Pools[Pools.Mobiles]
+                .Where(s => s.HasComponent<NetworkStateComponent>())
+                .FirstOrDefault(s => s.GetComponent<NetworkStateComponent>()?.AccountName == accountName);
         }
 
         public override void OnStateEnter()

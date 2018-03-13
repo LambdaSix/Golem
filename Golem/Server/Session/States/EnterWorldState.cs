@@ -1,12 +1,13 @@
-﻿using Golem.Game.Mobiles;
+﻿using Capsicum;
+using Golem.Game.Mobiles;
 
 namespace Golem.Server.Session.States
 {
     public class EnterWorldState : SessionState
     {
-        private readonly IPlayer _player;
+        private readonly Entity _player;
 
-        public EnterWorldState(IPlayer player)
+        public EnterWorldState(Entity player)
         {
             _player = player;
         }
@@ -17,12 +18,12 @@ namespace Golem.Server.Session.States
             Session.Player = _player;
 
             if (Session.Player != null)
-                Session.Player.LoggedIn = true;
+                Session.Player.GetComponent<NetworkStateComponent>().LoggedIn = true;
 
             // Session implements IOutputTextWriter, just looks weird :)
-            _player.SetOutputWriter(Session);
+            _player.GetComponent<NetworkStateComponent>().NetSession = Session;
 
-            var room = GolemServer.Current.Database.Get<Room>(_player.Location);
+            //var room = GolemServer.Current.Database.Get<Room>(_player.Location);
 
             base.OnStateInitialize();
         }

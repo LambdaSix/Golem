@@ -51,8 +51,8 @@ namespace Golem.Server.World
         public RoomExit FindExitByTarget(string targetKey) =>
             Exits.FirstOrDefault(s => s.Value.LeadsTo == targetKey).Value;
 
-        public void AddItem(InstancedItem item) => Items[item.Key] = item.Name;
-        public void RemoveItem(InstancedItem item) => Items.Remove(item.Key);
+        public void AddItem(ItemInstance item) => Items[item.Key] = item.Name;
+        public void RemoveItem(ItemInstance item) => Items.Remove(item.Key);
 
         public void SendPlayers(string format, IPlayer subject, IPlayer target, params IPlayer[] ignore)
         {
@@ -117,7 +117,7 @@ namespace Golem.Server.World
 
             foreach (var roomItem in Items)
             {
-                var item = GolemServer.Current.Database.Get<InstancedItem>(roomItem.Key);
+                var item = GolemServer.Current.Database.Get<ItemInstance>(roomItem.Key);
                 if (item != null)
                 {
                     if (PopItems.ContainsKey(item.TemplateKey))
@@ -135,10 +135,10 @@ namespace Golem.Server.World
                 var numInRoom = inRoom.ContainsKey(popItem.Key) ? inRoom[popItem.Key] : 0;
                 for (int i = 0; i < popItem.Value - numInRoom; i++)
                 {
-                    var itemToCopy = GolemServer.Current.Database.Get<PrototypeItem>(popItem.Key);
+                    var itemToCopy = GolemServer.Current.Database.Get<ItemTemplate>(popItem.Key);
                     if (GolemServer.Current.Random.NextDouble() < itemToCopy.RepopPercent)
                     {
-                        var itemInstance = new InstancedItem(itemToCopy);
+                        var itemInstance = new ItemInstance(itemToCopy);
                         GolemServer.Current.Database.Put(itemInstance);
                         AddItem(itemInstance);
                     }

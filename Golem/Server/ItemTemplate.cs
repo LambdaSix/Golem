@@ -3,7 +3,7 @@ using Golem.Server.Database;
 
 namespace Golem.Server
 {
-    public class PrototypeItem : IStorable
+    public class ItemTemplate : IStorable
     {
         /// <inheritdoc />
         public string Key => Name.ToLower();

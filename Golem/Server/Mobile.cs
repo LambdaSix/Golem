@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Timers;
+using Golem.Game;
 using Golem.Game.Items;
 using Golem.Game.Mobiles;
 using Golem.Server.Database;
+using Golem.Server.Helpers;
 using Golem.Server.Session;
 using Golem.Server.World;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Golem.Server
 {
@@ -40,17 +44,7 @@ namespace Golem.Server
         string Name { get; set; }
         string Description { get; set; }
 
-        int BaseStrength { get; set; }
-        int BaseDexterity { get; set; }
-        int BaseConstitution { get; set; }
-        int BaseIntelligence { get; set; }
-        int BaseWisdom { get; set; }
-        int BaseCharisma { get; set; }
-        int BaseLuck { get; set; }
-        int BaseDamRoll { get; set; }
-        int BaseHitRoll { get; set; }
-        int BaseHp { get; set; }
-        int BaseArmor { get; set; }
+        
         bool IsShopkeeper { get; set; }
         int HitPoints { get; set; }
         Dictionary<string, string> Inventory { get; }
@@ -69,6 +63,11 @@ namespace Golem.Server
         int Luck { get; }
         string HitPointDescription { get; }
         IEnumerable<string> Keywords { get; set; }
+        string Location { get; set; }
+        bool Aggro { get; set; }
+        MobileStatus Status { get; set; }
+        CombatRound Hit(IMobile player);
+        void Die();
     }
 
     public abstract class Mobile : IMobile
@@ -93,6 +92,11 @@ namespace Golem.Server
         public bool IsShopkeeper { get; set; }
 
         public int HitPoints { get; set; }
+
+        public MobileStatus Status { get; set; }
+        public string Location { get; set; }
+
+        public bool Aggro { get; set; }
 
         public Dictionary<string, string> Inventory { get; protected set; } = new Dictionary<string, string>();
 
@@ -242,7 +246,10 @@ namespace Golem.Server
             }
         }
 
-        private static InstancedItem AllGear(KeyValuePair<WearLocation, WearSlot> e)
+        private static ItemInstance AllGear(KeyValuePair<WearLocation, WearSlot> e)
+        {
+            return GolemServer.Current.Database.Get<ItemInstance>(e.Value.Key);
+        }
         {
             return GolemServer.Current.Database.Get<InstancedItem>(e.Value.Key);
         }
@@ -284,8 +291,24 @@ namespace Golem.Server
             }
         }
 
-        public MobileStatus Status { get; set; }
-        public string Location { get; set; }
+        public virtual CombatRound Hit(IPlayer player)
+        {
+            return null;
+        }
+
+        public void Die()
+        {
+            if (HitPoints < ServerConstants.DeadHitpoints)
+            {
+                Status = HitPoints >= ServerConstants.IncapacitatedHitpoints
+                    ? MobileStatus.Incapacitated
+                    : MobileStatus.MortallyWounded;
+            }
+            else
+            {
+                Status = MobileStatus.Dead;
+            }
+        }
     }
 
     public class MobTemplate : Mobile
@@ -294,11 +317,15 @@ namespace Golem.Server
         public string[] Phrases { get; set; }
         public double TalkProbability { get; set; }
         public long MinimumTalkInterval { get; set; }
-        public bool Aggro { get; set; }
+
         public List<string> AllowedRooms { get; set; } = new List<string>();
         public new List<string> Inventory { get; private set; } = new List<string>();
         public new Dictionary<WearLocation, string> Equipped { get; private set; } = new Dictionary<WearLocation, string>();
         public new Dictionary<string, Tuple<double,double>> Skills { get; private set; } = new Dictionary<string, Tuple<double, double>>();
+
+        public int CopperPeices { get; set; }
+        public int MaxCopperPieces { get; set; }
+        public int MinCopperPieces { get; set; }
     }
 
     public class MobInstance : Mobile
@@ -324,6 +351,9 @@ namespace Golem.Server
         public CoinStack MaxGold { get; set; }
         public CoinStack MinGold { get; set; }
 
+        [JsonIgnore]
+        public bool DoesWander => AllowedRooms != null && AllowedRooms.Count > 1;
+
         /// <summary>
         /// Copy constructor.
         /// </summary>
@@ -348,7 +378,285 @@ namespace Golem.Server
             BaseHitRoll = template.BaseHitRoll;
             BaseDamRoll = template.BaseDamRoll;
             AllowedRooms = template.AllowedRooms ?? new List<string>();
-            Inventory = template.Inventory ?? new Dictionary<string, string>();
+            Inventory = MapInventory(template.Inventory).AsDictionary() ?? new Dictionary<string, string>();
+            Equipped = MapEquipped(template.Equipped).AsDictionary() ?? new Dictionary<WearLocation, WearSlot>();
+            Skills = Skills ?? new Dictionary<string, Tuple<double, double>>();
+
+            _skillReady = true;
+            _lastTimeTalked = DateTime.Now;
+            _lastTimeWalked = DateTime.Now;
+            IsShopkeeper = template.IsShopkeeper;
+
+            Gold = new CoinStack(template.CopperPeices);
+            MinGold = new CoinStack(template.MinCopperPieces);
+            MaxGold = new CoinStack(template.MaxCopperPieces);
+        }
+
+        public MobInstance()
+        {
+            var guid = Guid.NewGuid();
+            while (GolemServer.Current.Database.Exists<MobInstance>(guid.ToString()))
+            {
+                guid = Guid.NewGuid();
+            }
+
+            _guid = guid;
+            _lastTimeTalked = DateTime.Now;
+            _lastTimeWalked = DateTime.Now;
+        }
+
+        public string GetRespawnRoom()
+        {
+            if (RespawnRoom == null || RespawnRoom.Length == 0)
+                return String.Empty;
+
+            if (RespawnRoom != null && RespawnRoom.Length > 1)
+                return RespawnRoom[GolemServer.Current.Random.Next(0, RespawnRoom.Length)];
+
+            return RespawnRoom[0];
+        }
+
+        private CoinStack GetRandomGold() => new CoinStack(GolemServer.Current.Random.Next((int)MinGold.RawValue, (int)MaxGold.RawValue));
+
+        public override CombatRound Hit(IPlayer player)
+        {
+            var round = new CombatRound();
+
+            if (GolemServer.Current.Random.Next(HitRoll) + 1 >= player.Armor)
+            {
+                // register a hit
+                var damage = GolemServer.Current.Random.Next(DamRoll) + 1;
+                player.HitPoints -= damage;
+
+                var damageAction = CombatHelper.GetDamageAction(player, damage);
+
+                var playerText = $"{Name} {damageAction.Plural} you for {damage} damage!";
+                round.AddText(player, playerText, CombatTextType.Player);
+
+                var groupText = $"{Name} {damageAction.Plural} {player.Forename}!";
+                round.AddText(player, groupText, CombatTextType.Group);
+            }
+            else
+            {
+                var playerText = $"{Name} misses you!";
+                round.AddText(player, playerText, CombatTextType.Player);
+
+                var groupText = $"{Name} misses {player.Forename}";
+                round.AddText(player, groupText, CombatTextType.Group);
+            }
+
+            if (!_skillLoopStarted && Skills.Any())
+                DoSkillLoop(null, null);
+
+            return round;
+        }
+
+        private void DoSkillLoop(object sender, ElapsedEventArgs e)
+        {
+            _skillLoopStarted = true;
+            _skillReady = true;
+
+            if (HitPoints > 0) // only use skills when alive
+            {
+                var keys = new List<string>(Skills.Keys);
+                var size = Skills.Count;
+                var skillKey = keys[GolemServer.Current.Random.Next(size)];
+                var skill = GolemServer.Current.CombatSkills.FirstOrDefault(s => s.Key == skillKey);
+                var command = GolemServer.Current.CommandLookup.FindCommand(skillKey, true);
+
+                if (skill == null || command == null)
+                {
+                    GolemServer.Current.Log($"Can't find NPC Skill: {skillKey}");
+                    return;
+                }
+                var frequency = Skills[skillKey].Item1;
+                var effectiveness = Skills[skillKey].Item2;
+
+                if (GolemServer.Current.Random.NextDouble() < frequency)
+                {
+                    var fight = GolemServer.Current.CombatHandler.FindFight(this);
+
+                    if (fight == null)
+                        return;
+
+                    IPlayer playerToHit = fight.GetRandomFighter();
+
+                    if (playerToHit == null)
+                        return;
+
+                    var room = RoomHelper.GetPlayerRoom(playerToHit.Location);
+
+                    if (GolemServer.Current.Random.NextDouble() < effectiveness)
+                    {
+                        var damage = GolemServer.Current.Random.Next(skill.MinDamage, skill.MaxDamage + 1);
+                        var damageAction = CombatHelper.GetDamageAction(playerToHit, damage);
+
+                        playerToHit.Send(
+                            $"{Name}{(Name.EndsWith("s") ? "'" : "'s")} {skillKey.ToLower()} {damageAction.Plural} you for {damage} damage!",
+                            null);
+                        playerToHit.HitPoints -= damage;
+
+                        room.SendPlayers(
+                            $"{Name}{(Name.EndsWith("s") ? "'" : "'s")} {skillKey.ToLower()} {damageAction.Plural} {playerToHit.Forename}",
+                            playerToHit, null, playerToHit);
+
+                        // Check if the player died
+                        if (playerToHit.HitPoints <= 0)
+                        {
+                            playerToHit.Die(); // set status
+
+                            var statusText = Player.GetStatusText(playerToHit.Status).ToUpper();
+                            var playerText = $"You are {statusText}!";
+                            if (playerToHit.HitPoints < ServerConstants.DeadHitpoints)
+                            {
+
+                                playerText += " You have respawned, but you're in a different location.\n" +
+                                              "Your corpse will remain for a short while, but you'll want to retrieve your\n" +
+                                              "items in short order.";
+
+                                playerToHit.DieForReal();
+                            }
+
+                            var groupText = $"{playerToHit.Forename} is {statusText}!";
+
+                            playerToHit.Send(playerText, null);
+                            room.SendPlayers(groupText, playerToHit, null, playerToHit);
+
+                            fight.RemoveFromCombat(playerToHit);
+
+                            if (!fight.GetFighters().Any())
+                            {
+                                fight.End();
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Miss
+                        playerToHit.Send($"{Name}{(Name.EndsWith("s") ? "'" : "'s")} {skillKey.ToLower()} misses you!",
+                            null);
+                        room.SendPlayers(
+                            $"{Name}{(skillKey.EndsWith("s") ? "'" : "'s")} {skillKey.ToLower()} misses {playerToHit.Forename}",
+                            playerToHit, null, playerToHit);
+                    }
+                }
+
+                _skillReady = false;
+
+                // set delay and call this method again
+                var t = new Timer()
+                {
+                    AutoReset = false,
+                    Interval = (long)command.TickLength,
+                };
+
+                t.Elapsed += DoSkillLoop;
+                t.Start();
+            }
+        }
+
+        public void TalkOrWalk()
+        {
+            if (Phrases != null && Phrases.Length > 0
+                                && AllowedRooms != null && AllowedRooms.Count > 1)
+            {
+                if (GolemServer.Current.Random.Next(2) == 0)
+                    Talk();
+                else
+                    Walk();
+            }
+            else if (Phrases != null && Phrases.Length > 0)
+                Talk();
+            else if (AllowedRooms != null && AllowedRooms.Count > 1)
+                Walk();
+        }
+
+        protected void Talk()
+        {
+            if ((DateTime.Now - _lastTimeTalked).TotalMilliseconds <= MinimumTalkInterval)
+                return;
+
+            // set the new interval
+            _lastTimeTalked = DateTime.Now;
+
+            // talk at random
+            double prob = GolemServer.Current.Random.NextDouble();
+            if (prob < TalkProbability && Phrases != null && Phrases.Length > 0)
+            {
+                var phrase = Phrases[GolemServer.Current.Random.Next(Phrases.Length)];
+
+                // say it to the room
+                var room = RoomHelper.GetPlayerRoom(Location);
+                if (room != null)
+                {
+                    string message = string.Format("{0} says, \"{1}\"", Name, phrase);
+                    room.SendPlayers(message, null, null, null);
+                }
+            }
+        }
+
+        protected void Walk()
+        {
+            if ((DateTime.Now - _lastTimeWalked).TotalMilliseconds <= ServerConstants.MobWalkInterval)
+                return;
+
+            _lastTimeWalked = DateTime.Now;
+
+            var room = RoomHelper.GetPlayerRoom(Location);
+
+            // get allowed exits
+            var allowedExits = room.Exits.Where(e => AllowedRooms.Contains(e.Value.LeadsTo) && e.Value.IsOpen).ToList();
+
+            if (allowedExits.Any() && GolemServer.Current.Random.NextDouble() < 0.5)
+            {
+                var exit = allowedExits.Skip(GolemServer.Current.Random.Next(allowedExits.Count())).FirstOrDefault();
+
+                room.RemoveMobile(this);
+                var newRoom = RoomHelper.GetPlayerRoom(exit.Value.LeadsTo);
+                newRoom.AddMobile(this);
+                Location = newRoom.Key;
+                room.SendPlayers(string.Format("{0} heads {1}.", Name, DirectionHelper.GetDirectionWord(exit.Key)),
+                                    null, null, null);
+                newRoom.SendPlayers(
+                    string.Format("{0} arrives from the {1}.", Name, DirectionHelper.GetOppositeDirection(exit.Key)),
+                    null, null, null);
+            }
+        }
+
+        private IEnumerable<KeyValuePair<string,string>> MapInventory(IEnumerable<string> inventory)
+        {
+            foreach (var key in inventory)
+            {
+                var itemTemplate = GolemServer.Current.Database.Get<ItemTemplate>(key);
+                var item = new ItemInstance(itemTemplate);
+                GolemServer.Current.Database.Save(item);
+                yield return new KeyValuePair<string, string>(item.Key, item.Name);
+            }
+        }
+
+        private IEnumerable<KeyValuePair<WearLocation, WearSlot>> MapEquipped(
+            Dictionary<WearLocation, string> equipment)
+        {
+            foreach (var piece in equipment)
+            {
+                var itemTemplate = GolemServer.Current.Database.Get<ItemTemplate>(piece.Value);
+                var item = new ItemInstance(itemTemplate);
+                GolemServer.Current.Database.Save(item);
+                yield return new KeyValuePair<WearLocation, WearSlot>(piece.Key, new WearSlot()
+                {
+                    Key = item.Key,
+                    Name = item.Name
+                });
+            }
+        }
+    }
+
+    public static class KeyValuePairExtensions
+    {
+        public static Dictionary<TKey, TValue> AsDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> sequence)
+        {
+            return sequence.ToDictionary(key => key.Key, value => value.Value);
         }
     }
 }

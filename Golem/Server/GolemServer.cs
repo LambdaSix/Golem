@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime;
 using System.Threading;
+using Capsicum;
+using Golem.Game;
 using Golem.Server.Database;
 using Golem.Server.Network;
 using Golem.Server.Session;
@@ -27,15 +29,49 @@ namespace Golem.Server
         Error,
     }
 
+    /// <summary>
+    /// artificial delay for commands
+    /// </summary>
+    public enum TickDelay
+    {
+        Instant = 1,
+        Single = 650,
+        Double = Single * 2,
+        Triple = Single * 3,
+        Quadruple = Single * 4,
+        Quintuple = Single * 5,
+        Sextuple = Single * 6,
+        Septuple = Single * 7,
+        Octuple = Single * 8,
+        Nonuple = Single * 9,
+        Decuple = Single * 10,
+        Reroll = Single * 20,
+    }
+
+    public enum Pools
+    {
+        General = 0,
+        Mobiles = 1,
+        Items = 2,
+
+    }
+
     public class ServerConstants
     {
-        public static object WelcomeRoom;
-        public static object StartRoom;
+        public static string WelcomeRoom = "Welcome Room";
+        public static object StartRoom = "The Academy";
 
         public static bool AutoApprovedEnabled = true;
-        public static int DeadHitpoints = -3;
-        public static int IncapacitatedHitpoints = -10;
+        public static int DeadHitpoints = -10;
+        public static int IncapacitatedHitpoints = -3;
         public static double CorpseDecayTimeMs = TimeSpan.FromMinutes(30).TotalMilliseconds;
+        public static double MobWalkInterval = TimeSpan.FromMinutes(5).TotalMilliseconds;
+        public static double RegenTime = TimeSpan.FromSeconds(30).TotalMilliseconds;
+        public static double AgeTime = TimeSpan.FromMinutes(1).TotalMilliseconds;
+
+        public static double TickRate = TimeSpan.FromMilliseconds(20).TotalMilliseconds;
+        public static double TickTime = 1000 / TickRate;
+        public static double CombatTickRate = TimeSpan.FromSeconds(1).TotalMilliseconds;
     }
 
     public class GolemServer : IDisposable
@@ -44,14 +80,19 @@ namespace Golem.Server
         public IConnectionMonitor ConnMonitor { get; }
         public ISessionMonitor SessionMonitor { get; }
         public IDatabase Database { get; }
+//        public IEnumerable<IHandler> Handlers { get; }
+
+        public Dictionary<Pools, Pool> Pools { get; } = new Dictionary<Pools, Pool>();
+
+        public IEnumerable<CombatSkill> CombatSkills { get; set; }
+
         public static GolemServer Current { get; private set; }
         public Random Random { get; } = new Random();
 
         private bool _closing;
         private readonly AutoResetEvent _signal = new AutoResetEvent(true);
         private bool IsDebug { get; set; }
-
-
+        
         // TODO: Make a singleton WorldState?
         public DateTime CurrentTime { get; set; }
 
@@ -61,16 +102,24 @@ namespace Golem.Server
             IConnectionListener connListener,
             IConnectionMonitor connMonitor,
             ISessionMonitor sessionMonitor,
-            IDatabase database,
-            IDynamicCommandLookup dynamicCommandLookup,
-            IEnumerable<IHandlers> handlers
+            IDatabase database
+            //IDynamicCommandLookup dynamicCommandLookup,
+            //IEnumerable<IHandler> handlers
             )
         {
             ConnListener = connListener;
             ConnMonitor = connMonitor;
             SessionMonitor = sessionMonitor;
             Database = database;
+            //Handlers = handlers;
             Current = this;
+
+            Pools = new Dictionary<Pools, Pool>()
+            {
+                [Server.Pools.General] = new Pool(),
+                [Server.Pools.Mobiles] = new Pool(),
+                [Server.Pools.Items] = new Pool(),
+            };
         }
 
         public void Main(ServerOptions options)

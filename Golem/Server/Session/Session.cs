@@ -1,17 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using Capsicum;
+using Capsicum.Interfaces;
+using Capsicum.Serialization;
+using Golem.Game.Mobiles;
 using Golem.Server.Network;
 using Golem.Server.Text;
 
 namespace Golem.Server.Session
 {
+    public class NetworkStateComponent : ISerializableComponent
+    {
+        public string AccountName { get; set; }
+        public bool LoggedIn { get; set; }
+
+        // Transient by connection
+        public int SessionId { get; set; }
+
+        // Transient by connection
+        public ISession NetSession { get; set; }
+
+
+        /// <inheritdoc />
+        public byte[] Serialize()
+        {
+            using (var bw = new BinaryWriter(new MemoryStream()))
+            {
+                bw.Write(AccountName);
+                bw.Write(LoggedIn);
+
+                return (bw.BaseStream as MemoryStream)?.ToArray();
+            }
+        }
+
+        /// <inheritdoc />
+        public void Deserialize(byte[] data)
+        {
+            using (var br = new BinaryReader(new MemoryStream(data)))
+            {
+                AccountName = br.ReadString();
+                LoggedIn = br.ReadBoolean();
+            }
+        }
+    }
+
     public class Session : ISession
     {
         private Stack<SessionState> SessionStates { get; } = new Stack<SessionState>();
         private IConnection Connection { get; set; }
 
         public ITextTransformer OutputTransformer { get; set; }
-        public IPlayer Player { get; set; }
+        public Entity Player { get; set; }
 
         public event EventHandler SessionEnded;
 
@@ -103,7 +143,7 @@ namespace Golem.Server.Session
         public void End()
         {
             if (Player != null)
-                Player.LoggedIn = false;
+                Player.GetComponent<NetworkStateComponent>().LoggedIn = false;
 
             foreach (var session in SessionStates)
             {
@@ -126,10 +166,9 @@ namespace Golem.Server.Session
             End();
         }
 
-        private void OnInputReceived(object sender, EventArgs e)
+        private void OnInputReceived(object sender, LineReceivedEventArgs e)
         {
-            if (CurrentState != null)
-                CurrentState.OnInput(e.Data);
+            CurrentState?.OnInput(e.Data);
         }
 
         private void OnSessionEnded()

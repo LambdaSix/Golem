@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Capsicum;
 using Golem.Game.Mobiles;
 using Golem.Server.Network;
 using Golem.Server.Text;
@@ -10,7 +11,7 @@ namespace Golem.Server.Session
     {
         event EventHandler SessionEnded;
 
-        IPlayer Player { get; set; }
+        Entity Player { get; set; }
 
         void HandConnectionTo(ISession session);
         void ChangeConnection(IConnection connection);

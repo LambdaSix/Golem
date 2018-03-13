@@ -28,14 +28,22 @@ namespace Golem.Game.Mobiles
 
     public enum MobileStatus
     {
-        Sitting,
-        Standing,
-        Sleeping,
         Fighting,
         Incapacitated, // something like >= -3 hp
         MortallyWounded, // will die if unaided
         Dead,
         Trade,
+    }
+
+    public enum CharacterPosture
+    {
+        None,   //< The character has no posture.
+        Stand,  //< The character is standing.
+        Crouch, //< The character is crouched.
+        Prone,  //< The character is prone.
+        Sit,    //< The character is sitting.
+        Rest,   //< The character is lying down.
+        Sleep,  //< The character is sleeping.
     }
 
     public struct WearSlot
@@ -194,21 +202,12 @@ namespace Golem.Game.Mobiles
             return round;
         }
 
-        public void Die()
-        {
-            if (HitPoints < ServerConstants.DeadHitpoints)
-            {
-                Status = HitPoints >= ServerConstants.IncapacitatedHitpoints
-                    ? MobileStatus.Incapacitated
-                    : MobileStatus.MortallyWounded;
-            }
-            else
-            {
-                Status = MobileStatus.Dead;
-            }
-        }
 
-        public void GenerateCorpse()
+        /// <inheritdoc />
+        [Obsolete("Use IPlayer::GenerateCorpse()")]
+        public CombatRound DieForReal() => GenerateCorpse();
+
+        public CombatRound GenerateCorpse()
         {
             // Sit the character down
             Status = MobileStatus.Sitting;
@@ -218,8 +217,8 @@ namespace Golem.Game.Mobiles
             deathRoom.RemovePlayer(this);
 
             // Create a corpse
-            var corpsePrototype = GolemServer.Current.Database.Get<PrototypeItem>("Corpse");
-            var realCorpse = new InstancedItem(corpsePrototype);
+            var corpsePrototype = GolemServer.Current.Database.Get<ItemTemplate>("Corpse");
+            var realCorpse = new ItemInstance(corpsePrototype);
             var corpseName = $"The corpse of {Forename}";
 
             realCorpse.AllowedToLoot = Key;
@@ -248,7 +247,7 @@ namespace Golem.Game.Mobiles
 
             var room = RoomHelper.GetPlayerRoom(RespawnRoom);
             Location = RespawnRoom;
-            room.AddPlayer(this);
+            room.AddMobile(this);
         }
 
         public string Whois()
@@ -312,7 +311,7 @@ namespace Golem.Game.Mobiles
 
             foreach (var key in Inventory.Keys.Union(Equipped.Values.Select(w => w.Key)))
             {
-                var item = GolemServer.Current.Database.Get<InstancedItem>(key);
+                var item = GolemServer.Current.Database.Get<ItemInstance>(key);
                 if (item != null)
                 {
                     if (item.WearLocation == WearLocation.Container)
@@ -342,7 +341,7 @@ namespace Golem.Game.Mobiles
         string PasswordHash { get; set; }
         string ShortDescription { get; set; }
         string Description { get; set; }
-        object Location { get; set; }
+        string Location { get; set; }
         bool Approved { get; set; }
         PlayerGender Gender { get; set; }
         PlayerPronouns Pronouns { get; set; }
@@ -375,5 +374,10 @@ namespace Golem.Game.Mobiles
         void SetOutputWriter(IOutputTextWriter writer);
         void Send(string format, IPlayer subject);
         void Send(string format, IPlayer subject, IPlayer target);
+
+        [Obsolete("Use IPlayer::GenerateCorpse()")]
+        void DieForReal();
+
+        void Die();
     }
 }

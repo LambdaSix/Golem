@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace Golem.Server
 {
-    public class InstancedItem : IStorable, IEquipable
+    public class ItemInstance : IStorable, IEquipable
     {
         private Guid _guid;
         
@@ -59,7 +59,7 @@ namespace Golem.Server
                 int weight = Weight;
                 foreach (var key in ContainedItems.Keys)
                 {
-                    var item = GolemServer.Current.Database.Get<InstancedItem>(key);
+                    var item = GolemServer.Current.Database.Get<ItemInstance>(key);
                     if (item.WearLocation == WearLocation.Container) // Another container, recursive maaan
                         weight += item.ContainerWeight;
                     else
@@ -70,7 +70,7 @@ namespace Golem.Server
             }
         }
 
-        public InstancedItem(PrototypeItem prototype)
+        public ItemInstance(ItemTemplate prototype)
         {
             Name = prototype.Name;
             Description = prototype.Description;

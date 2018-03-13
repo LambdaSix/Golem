@@ -61,26 +61,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game\ButcherAction.cs" />
+    <Compile Include="Game\CombatHandler.cs" />
+    <Compile Include="Game\CombatSkill.cs" />
+    <Compile Include="Game\Commands\CommunicationCommands.cs" />
     <Compile Include="Game\Items\Coins.cs" />
+    <Compile Include="Game\Mobiles\Dragon.cs" />
     <Compile Include="Server\Account\Account.cs" />
     <Compile Include="Server\Helpers\ExperienceHelper.cs" />
     <Compile Include="Game\Mobiles\Player.cs" />
-    <Compile Include="Server\Attributes\CommandAttribute.cs" />
     <Compile Include="Server\Attributes\GameCommand.cs" />
     <Compile Include="Server\Database\Storable.cs" />
     <Compile Include="Server\Extensions\StringExtensions.cs" />
     <Compile Include="Server\Helpers\RoomHelper.cs" />
     <Compile Include="Server\IConnectionListener.cs" />
     <Compile Include="Server\IConnectionMonitor.cs" />
-    <Compile Include="Server\InstancedItem.cs" />
+    <Compile Include="Server\ItemInstance.cs" />
     <Compile Include="Server\IService.cs" />
+    <Compile Include="Server\Mobiles\MobileComponents.cs" />
     <Compile Include="Server\Network\ConnectionEventArgs.cs" />
     <Compile Include="Server\Network\ConnectionHandler.cs" />
     <Compile Include="Server\Network\ConnectionListener.cs" />
     <Compile Include="Server\Network\ConnectionMonitor.cs" />
     <Compile Include="Server\Network\IConnection.cs" />
     <Compile Include="Server\Network\LineReceivedEventArgs.cs" />
-    <Compile Include="Server\PrototypeItem.cs" />
+    <Compile Include="Server\ItemTemplate.cs" />
     <Compile Include="Server\Session\ISession.cs" />
     <Compile Include="Server\Session\ISessionMonitor.cs" />
     <Compile Include="Server\IUpdatable.cs" />
@@ -99,6 +104,7 @@
     <Compile Include="Server\Session\States\CreateNewPlayerState.cs" />
     <Compile Include="Server\Session\States\EnterWorldState.cs" />
     <Compile Include="Server\Session\States\PlayerLoginState.cs" />
+    <Compile Include="Server\Skills\SkillComponent.cs" />
     <Compile Include="Server\Text\ITextTransformer.cs" />
     <Compile Include="Server\Text\IOutputTextWriter.cs" />
     <Compile Include="Server\TimeConstants.cs" />
@@ -114,7 +120,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Game\Commands\" />
     <Folder Include="Game\Core\" />
     <Folder Include="Game\Skills\" />
     <Folder Include="Game\Spells\" />
