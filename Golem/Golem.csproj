@@ -132,10 +132,6 @@
       <Project>{15FC1429-8161-4A89-A1E1-5AF4C8AA134A}</Project>
       <Name>Capsicum</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Golem.Database\Golem.Database.csproj">
-      <Project>{C22D7108-E250-41EA-9363-E9E61D0DD9B6}</Project>
-      <Name>Golem.Database</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
