@@ -1,0 +1,16 @@
+language: csharp
+solution: Golem.sln
+install:
+  - nuget restore Golem.sln
+  - nuget install NUnit.Runners -OutputDirectory testrunner
+script:
+  - xbuild Golem.sln /p:TargetFrameworkVersion="v4.6.2" /p:Configuration=Release
+#  - mono ./testrunner/NUnit.ConsoleRunner.*/tools/nunit3-console.exe ./Golem.Test/bin/Release/Golem.Test.dll
+  
+# Disabling package generation for now.
+#deploy:
+#  skip_cleanup: true
+#  provider: script
+#  script: chmod +x ./deploy/deploy.sh && ./deploy/deploy.sh $NUGET_API_KEY $NUGET_SOURCE
+#  on:
+#    branch: master
